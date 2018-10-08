@@ -202,9 +202,30 @@ class Engine extends EventEmitter {
   }
 
   /**
+   * Runs a single rule
+   * @param {Rule} rule - rule to be evaluated
+   * @param  {Object} runtimeFacts - fact values known at runtime
+   * @returns {Promise<Boolean>} resolves with true when rule evaluated successfully; false otherwise
+   */
+  evaluateRule (rule, runtimeFacts = {}) {
+    if (!rule) throw new Error('Engine: evaluateRule() requires a rule')
+    if (!rule.hasOwnProperty('conditions')) throw new Error('Engine: evaluateRule() rule argument requires "conditions" property')
+    if (!(rule instanceof Rule)) {
+      rule = new Rule(rule)
+    }
+    rule.setEngine(this)
+    debug(`engine::evaluateRule started`)
+    debug(`engine::evaluateRule runtimeFacts:`, runtimeFacts)
+    let almanac = new Almanac(this.facts, runtimeFacts)
+    return rule.evaluate(almanac).then((ruleResult) => {
+      debug(`engine::run ruleResult:${ruleResult.result}`)
+      return ruleResult.result
+    })
+  }
+
+  /**
    * Runs the rules engine
    * @param  {Object} runtimeFacts - fact values known at runtime
-   * @param  {Object} runOptions - run options
    * @return {Promise} resolves when the engine has completed running
    */
   run (runtimeFacts = {}) {

@@ -141,7 +141,8 @@ engine.removeOperator('startsWithLetter');
 
 ### engine.run([Object facts], [Object options]) -> Promise (Events)
 
-Runs the rules engine.  Returns a promise which resolves when all rules have been run.
+Runs the rules engine.  Returns a promise which resolves with the almanac when all rules have been run.
+The almanac contains the `success-events` fact, which is an array of all successfully evaluated events.
 
 ```js
 // run the engine
@@ -150,11 +151,15 @@ engine.run()
 // with constant facts
 engine.run({ userId: 1 })
 
-// returns rule events that were triggered
+// returns the almanac which was used to evaluate the rules
 engine
   .run({ userId: 1 })
-  .then(function(events) {
-    console.log(events)
+  .then(function(almanac) {
+    console.log(almanac)
+    return almanac.factValue('success-events')
+  })
+  .then((events) => {
+    console.log(events) // [{ type: 'event1', params: { hello: 'world' } }] 
   })
 ```
 
@@ -191,3 +196,22 @@ engine.on('failure', function(event, almanac, ruleResult) {
   console.log(event) // { type: 'my-event', params: { id: 1 }
 })
 ```
+
+### engine.evaluateRule(Rule instance|Object options, [Object facts]) -> Promise (Boolean)
+
+Evaluates only the specified rule.  Returns a promise which resolves with true if the rule evaluated successfully, false otherwise.
+
+```js
+// evaluate the rule
+engine
+  .evaluateRule(rule)
+  .then((result) => {
+    console.log(result) // true or false
+  })
+
+// with constant facts
+engine
+  .evaluateRule(rule, { userId: 1 })
+  .then((result) => {
+    console.log(result) // true or false
+  })
