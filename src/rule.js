@@ -10,6 +10,7 @@ class Rule extends EventEmitter {
   /**
    * returns a new Rule instance
    * @param {object,string} options, or json string that can be parsed into options
+   * @param {string} options.name - optional rule name
    * @param {integer} options.priority (>1) - higher runs sooner.
    * @param {Object} options.event - event to fire when rule evaluates as successful
    * @param {string} options.event.type - name of event to emit
@@ -31,12 +32,17 @@ class Rule extends EventEmitter {
     if (options && options.onFailure) {
       this.on('failure', options.onFailure)
     }
+    if (options && options.onError) {
+      this.on('error', options.onError)
+    }
 
     let priority = (options && options.priority) || 1
     this.setPriority(priority)
 
     let event = (options && options.event) || { type: 'unknown' }
     this.setEvent(event)
+
+    options && (this.name = options.name)
   }
 
   /**
@@ -101,7 +107,7 @@ class Rule extends EventEmitter {
   }
 
   /**
-   * Priorizes an array of conditions based on "priority"
+   * Prioritises an array of conditions based on "priority"
    *   When no explicit priority is provided on the condition itself, the condition's priority is determine by its fact
    * @param  {Condition[]} conditions
    * @return {Condition[][]} prioritized two-dimensional array of conditions
@@ -256,17 +262,31 @@ class Rule extends EventEmitter {
     let processResult = (result) => {
       ruleResult.setResult(result)
 
-      if (result) this.emit('success', ruleResult.event, almanac, ruleResult)
-      else this.emit('failure', ruleResult.event, almanac, ruleResult)
+      if (result) this.emit('success', ruleResult.event, almanac, ruleResult, this)
+      else this.emit('failure', ruleResult.event, almanac, ruleResult, this)
       return ruleResult
+    }
+
+    /**
+     * Adds a rule name to the error
+     * @param {Error} error
+     */
+    let processError = (error) => {
+      error.rule = {
+        name: this.name
+      }
+      this.emit('error', error)
+      throw error
     }
 
     if (ruleResult.conditions.any) {
       return any(ruleResult.conditions.any)
         .then(result => processResult(result))
+        .catch(processError)
     } else {
       return all(ruleResult.conditions.all)
         .then(result => processResult(result))
+        .catch(processError)
     }
   }
 }

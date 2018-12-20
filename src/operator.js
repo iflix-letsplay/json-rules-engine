@@ -24,6 +24,13 @@ export default class Operator {
    * @returns {Boolean} - whether the values pass the operator test
    */
   evaluate (factValue, jsonValue) {
-    return this.factValueValidator(factValue) && this.cb(factValue, jsonValue)
+    try {
+      return this.factValueValidator(factValue) && this.cb(factValue, jsonValue)
+    } catch (error) {
+      error.operator = {
+        name: this.name
+      }
+      throw error
+    }
   }
 }
