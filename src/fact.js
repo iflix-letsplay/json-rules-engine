@@ -57,7 +57,23 @@ class Fact {
     if (this.hasOwnProperty('value')) {
       return this.value
     }
-    return this.calculationMethod(params, almanac)
+    try {
+      const result = this.calculationMethod(params, almanac)
+      if (result.catch) {
+        return result.catch(error => {
+          error.fact = {
+            name: this.id
+          }
+          throw error
+        })
+      }
+      return result
+    } catch (error) {
+      error.fact = {
+        name: this.id
+      }
+      throw error
+    }
   }
 
   /**

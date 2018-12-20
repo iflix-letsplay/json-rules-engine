@@ -21,6 +21,7 @@ Returns a new rule instance
 
 ```js
 let options = {
+  name: 'Sample rule', // Used for better error handling
   conditions: {
     all: [
       {
@@ -42,6 +43,8 @@ let options = {
 }
 let rule = new Rule(options)
 ```
+
+**options.name** : `[String]` Rule name; used for better error handling
 
 **options.conditions** : `[Object]` Rule conditions object
 

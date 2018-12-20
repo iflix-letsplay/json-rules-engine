@@ -62,11 +62,13 @@ let Rule = require('json-rules-engine').Rule
 
 // via rule properties:
 engine.addRule({
+  name: 'Empty rule',
   conditions: {},
   event: {},
   priority: 1,                             // optional, default: 1
   onSuccess: function (event, almanac) {}, // optional
   onFailure: function (event, almanac) {}, // optional
+  onError: function (error) {} // optional
 })
 
 // or rule instance:
@@ -107,7 +109,8 @@ engine.addOperator('startsWithLetter', (factValue, jsonValue) => {
 })
 
 // and to use the operator...
-let rule = new Rule(
+let rule = new Rule({
+  name: 'Username validator',
   conditions: {
     all: [
       {
@@ -117,7 +120,7 @@ let rule = new Rule(
       }
     ]
   }
-)
+})
 ```
 
 See the [operator example](../examples/06-custom-operators.js)
@@ -141,8 +144,9 @@ engine.removeOperator('startsWithLetter');
 
 ### engine.run([Object facts], [Object options]) -> Promise (Events)
 
-Runs the rules engine.  Returns a promise which resolves with the almanac when all rules have been run.
-The almanac contains the `success-events` fact, which is an array of all successfully evaluated events.
+Runs the rules engine.  Returns a promise which resolves with the almanac when all rules have been run or rejects with 
+error when there was something wrong. The almanac contains the `success-events` fact, which is an array of all 
+successfully evaluated events.
 
 ```js
 // run the engine
@@ -160,6 +164,11 @@ engine
   })
   .then((events) => {
     console.log(events) // [{ type: 'event1', params: { hello: 'world' } }] 
+  })
+  .catch((error) => {
+    console.log(error.rule.name) // if rule name is set, it will be added to the error object
+    console.log(error.fact.name) // if the error happened while resolving a fact, it's name will be added to the error object
+    console.log(error.operator.name) // if the error happened while executing an operator, it's name will be added to the error object
   })
 ```
 
@@ -197,9 +206,24 @@ engine.on('failure', function(event, almanac, ruleResult) {
 })
 ```
 
+#### ```engine.on('error', Function(Error error))```
+
+Event fires when an exception happens while evaluating a rule, a fact or executing an operator.  The callback will 
+receive an Error object augmented with `rule.name` property, and `fact.name` or `operator.name` depending on where the
+error happened.
+
+```js
+engine.on('error', function(error) {
+  console.log(error.rule) // { name: 'Sample rule' }
+  console.log(error.fact) // { name: 'my-custom-fact' }, optional
+  console.log(error.operator) // { name: 'objectIncludesKeys' }, optional
+})
+```
+
 ### engine.evaluateRule(Rule instance|Object options, [Object facts]) -> Promise (Boolean)
 
-Evaluates only the specified rule.  Returns a promise which resolves with true if the rule evaluated successfully, false otherwise.
+Evaluates only the specified rule. Returns a promise which resolves with true if the rule evaluated successfully, false 
+otherwise. Rejects with the same error object as in `engine.run`
 
 ```js
 // evaluate the rule
@@ -207,6 +231,11 @@ engine
   .evaluateRule(rule)
   .then((result) => {
     console.log(result) // true or false
+  })
+  .catch((error) => {
+    console.log(error.rule.name) // if rule name is set, it will be added to the error object
+    console.log(error.fact.name) // if the error happened while resolving a fact, it's name will be added to the error object
+    console.log(error.operator.name) // if the error happened while executing an operator, it's name will be added to the error object
   })
 
 // with constant facts
