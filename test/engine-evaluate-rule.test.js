@@ -28,7 +28,7 @@ describe('Engine: run', () => {
     it('treats each evaluateRule() independently', async () => {
       const rule = factories.rule({ conditions: condition21 })
       const results = await Promise.all([50, 10, 12, 30, 14, 15, 25].map((age) => engine.evaluateRule(rule, {age})))
-      expect(results).to.eql([true, false, false, true, false, false, true])
+      expect(results.map(_ => _.result)).to.eql([true, false, false, true, false, false, true])
     })
 
     it('evaluateRule can return evaluation result', async () => {
@@ -37,7 +37,8 @@ describe('Engine: run', () => {
       const rule = factories.rule({ conditions: condition21 })
 
       let result
-      result = await engine.evaluateRule(rule, {}, true)
+      result = await engine.evaluateRule(rule)
+      expect(result).to.have.property('result', true)
       expect(result).to.have.nested.property('conditions.any[0].factResult', 30)
       expect(result).to.have.nested.property('conditions.any[0].result', true)
     })
@@ -49,13 +50,13 @@ describe('Engine: run', () => {
 
       let result
       result = await engine.evaluateRule(rule, { age: 85 }) // override 'age' with runtime fact
-      expect(result).to.equal(true)
+      expect(result.result).to.equal(true)
 
       result = await engine.evaluateRule(rule) // no runtime fact; revert to age: 30
-      expect(result).to.equal(false)
+      expect(result.result).to.equal(false)
 
       result = await engine.evaluateRule(rule, { age: 2 }) // override 'age' with runtime fact
-      expect(result).to.equal(false)
+      expect(result.result).to.equal(false)
     })
   })
 })

@@ -137,7 +137,7 @@ class Rule extends EventEmitter {
    * All evaluation is done within the context of an almanac
    * @return {Promise(RuleResult)} rule evaluation result
    */
-  evaluate (almanac, saveEvaluation = false) {
+  evaluate (almanac) {
     let ruleResult = new RuleResult(this.conditions, this.event, this.priority)
 
     /**
@@ -177,7 +177,7 @@ class Rule extends EventEmitter {
     }
 
     /**
-     * Evalutes an array of conditions, using an 'every' or 'some' array operation
+     * Evaluates an array of conditions, using an 'every' or 'some' array operation
      * @param  {Condition[]} conditions
      * @param  {string(every|some)} array method to call for determining result
      * @return {Promise(boolean)} whether conditions evaluated truthy or falsey based on condition evaluation + method
@@ -261,8 +261,6 @@ class Rule extends EventEmitter {
      */
     let processResult = (result) => {
       ruleResult.setResult(result)
-
-      if (saveEvaluation) this.evaluationResult = result
 
       if (result) this.emit('success', ruleResult.event, almanac, ruleResult, this)
       else this.emit('failure', ruleResult.event, almanac, ruleResult, this)
