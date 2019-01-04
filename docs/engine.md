@@ -244,3 +244,37 @@ engine
   .then((result) => {
     console.log(result) // true or false
   })
+```
+
+### engine.evaluateRule(Rule instance|Object options, Object facts, Boolean saveEvaluation) -> Promise (Boolean)
+
+Evaluates only the specified rule. Returns a promise which resolves with a RuleResult object. Rejects with the same error object as in `engine.run`.
+When runtime facts object is not needed, the method must be called with facts set to empty object {}
+
+```js
+// evaluate the rule without runtime facts
+engine
+  .evaluateRule(rule, {}, true)
+  .then((result) => {
+    console.log(result) // { conditions, event, priority, result }
+  })
+
+// with constant facts
+engine
+  .evaluateRule(rule, { userId: 1 }, true)
+  .then((result) => {
+    console.log(result) // { conditions, event, priority, result }
+  })
+```
+
+Here, `conditions` in the resulting object are the same conditions as supplied by the rule, except they are augmented by
+`factResult` and `result` properties, so a single condition might look like this:
+```json5
+{
+  fact: 'age',
+  factResult: 30,
+  operator: 'greaterThanOrEqual',
+  value: 30,
+  result: true
+}
+``` 

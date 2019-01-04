@@ -31,6 +31,17 @@ describe('Engine: run', () => {
       expect(results).to.eql([true, false, false, true, false, false, true])
     })
 
+    it('evaluateRule can return evaluation result', async () => {
+      engine.addFact('age', 30)
+
+      const rule = factories.rule({ conditions: condition21 })
+
+      let result
+      result = await engine.evaluateRule(rule, {}, true)
+      expect(result).to.have.nested.property('conditions.any[0].factResult', 30)
+      expect(result).to.have.nested.property('conditions.any[0].result', true)
+    })
+
     it('allows runtime facts to override engine facts for a single evaluateRule()', async () => {
       engine.addFact('age', 30)
 

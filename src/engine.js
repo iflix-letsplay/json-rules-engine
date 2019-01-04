@@ -207,10 +207,12 @@ class Engine extends EventEmitter {
   /**
    * Runs a single rule
    * @param {Rule} rule - rule to be evaluated
-   * @param  {Object} runtimeFacts - fact values known at runtime
-   * @returns {Promise<Boolean>} resolves with true when rule evaluated successfully; false otherwise
+   * @param {Object} runtimeFacts - fact values known at runtime
+   * @param {Boolean} saveEvaluation - whether to save rule evaluation to the rule (in the .evaluationResult property) and return it or not
+   * @returns {Promise<Boolean | RuleResult>} resolves with a boolean (true when rule evaluated successfully; false otherwise)
+   *    when the saveEvaluation flag is false, and a RuleResult object when saveEvaluation is true
    */
-  evaluateRule (rule, runtimeFacts = {}) {
+  evaluateRule (rule, runtimeFacts = {}, saveEvaluation = false) {
     if (!rule) throw new Error('Engine: evaluateRule() requires a rule')
     if (!rule.hasOwnProperty('conditions')) throw new Error('Engine: evaluateRule() rule argument requires "conditions" property')
     if (!(rule instanceof Rule)) {
@@ -220,8 +222,9 @@ class Engine extends EventEmitter {
     debug(`engine::evaluateRule started`)
     debug(`engine::evaluateRule runtimeFacts:`, runtimeFacts)
     let almanac = new Almanac(this.facts, runtimeFacts)
-    return rule.evaluate(almanac).then((ruleResult) => {
+    return rule.evaluate(almanac, saveEvaluation).then((ruleResult) => {
       debug(`engine::run ruleResult:${ruleResult.result}`)
+      if (saveEvaluation) return ruleResult
       return ruleResult.result
     }).catch((error) => {
       this.emit('error', error)
