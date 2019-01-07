@@ -12,6 +12,8 @@ export default class RuleResult {
 
   setResult (result) {
     this.result = result
+    // set root condition result as well
+    this.conditions.result = this.result
   }
 
   toJSON () {
