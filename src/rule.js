@@ -94,16 +94,12 @@ class Rule extends EventEmitter {
     return this
   }
 
-  toJSON (stringify = true) {
-    let props = {
-      conditions: this.conditions.toJSON(false),
+  toJSON () {
+    return {
+      conditions: this.conditions.toJSON(),
       priority: this.priority,
       event: this.event
     }
-    if (stringify) {
-      return JSON.stringify(props)
-    }
-    return props
   }
 
   /**

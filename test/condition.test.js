@@ -53,7 +53,7 @@ describe('Condition', () => {
         }
       })
       let condition = new Condition(properties)
-      let json = condition.toJSON()
+      let json = JSON.stringify(condition)
       expect(json).to.equal('{"operator":"equal","value":{"fact":"weight","params":{"unit":"lbs"},"path":".value"},"fact":"age"}')
     })
   })

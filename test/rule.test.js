@@ -202,7 +202,7 @@ describe('Rule', () => {
     })
 
     it('serializes itself as json', () => {
-      let jsonString = rule.toJSON()
+      let jsonString = JSON.stringify(rule)
       expect(jsonString).to.be.a('string')
       let json = JSON.parse(jsonString)
       expect(Object.keys(json).length).to.equal(3)
@@ -212,7 +212,7 @@ describe('Rule', () => {
     })
 
     it('rehydrates itself using a JSON string', () => {
-      let jsonString = rule.toJSON()
+      let jsonString = JSON.stringify(rule)
       expect(jsonString).to.be.a('string')
       let hydratedRule = new Rule(jsonString)
       expect(hydratedRule.conditions).to.eql(rule.conditions)
@@ -221,7 +221,7 @@ describe('Rule', () => {
     })
 
     it('rehydrates itself using an object from JSON.parse()', () => {
-      let jsonString = rule.toJSON()
+      let jsonString = JSON.stringify(rule)
       expect(jsonString).to.be.a('string')
       let json = JSON.parse(jsonString)
       let hydratedRule = new Rule(json)

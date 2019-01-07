@@ -14,16 +14,12 @@ export default class RuleResult {
     this.result = result
   }
 
-  toJSON (stringify = true) {
-    let props = {
-      conditions: this.conditions.toJSON(false),
+  toJSON () {
+    return {
+      conditions: this.conditions.toJSON(),
       event: this.event,
       priority: this.priority,
       result: this.result
     }
-    if (stringify) {
-      return JSON.stringify(props)
-    }
-    return props
   }
 }

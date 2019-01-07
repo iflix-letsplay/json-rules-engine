@@ -34,17 +34,16 @@ export default class Condition {
 
   /**
    * Converts the condition into a json-friendly structure
-   * @param   {Boolean} stringify - whether to return as a json string
-   * @returns {string,object} json string or json-friendly object
+   * @returns {object} json-friendly object
    */
-  toJSON (stringify = true) {
+  toJSON () {
     let props = {}
     if (this.priority) {
       props.priority = this.priority
     }
     let oper = Condition.booleanOperator(this)
     if (oper) {
-      props[oper] = this[oper].map((c) => c.toJSON(stringify))
+      props[oper] = this[oper].map((c) => c.toJSON())
     } else {
       props.operator = this.operator
       props.value = this.value
@@ -61,9 +60,6 @@ export default class Condition {
       if (this.path) {
         props.path = this.path
       }
-    }
-    if (stringify) {
-      return JSON.stringify(props)
     }
     return props
   }
