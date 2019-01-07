@@ -17,8 +17,10 @@ export default class RuleResult {
   }
 
   toJSON () {
+    const conditions = this.conditions.toJSON()
+    conditions.result = this.result
     return {
-      conditions: this.conditions.toJSON(),
+      conditions: conditions,
       event: this.event,
       priority: this.priority,
       result: this.result

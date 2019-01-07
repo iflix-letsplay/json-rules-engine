@@ -38,9 +38,14 @@ export default class Condition {
    */
   toJSON () {
     let props = {}
+    // common props
+    if (this.result !== undefined) {
+      props.result = this.result
+    }
     if (this.priority) {
       props.priority = this.priority
     }
+
     let oper = Condition.booleanOperator(this)
     if (oper) {
       props[oper] = this[oper].map((c) => c.toJSON())
@@ -50,9 +55,6 @@ export default class Condition {
       props.fact = this.fact
       if (this.factResult !== undefined) {
         props.factResult = this.factResult
-      }
-      if (this.result !== undefined) {
-        props.result = this.result
       }
       if (this.params) {
         props.params = this.params

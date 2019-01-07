@@ -39,6 +39,8 @@ describe('Engine: run', () => {
       let result
       result = await engine.evaluateRule(rule)
       expect(result).to.have.property('result', true)
+      expect(result).to.have.nested.property('conditions.result', true)
+      expect(result).to.have.nested.property('conditions.operator', 'any')
       expect(result).to.have.nested.property('conditions.any[0].factResult', 30)
       expect(result).to.have.nested.property('conditions.any[0].result', true)
     })

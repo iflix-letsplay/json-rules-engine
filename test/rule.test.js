@@ -194,7 +194,7 @@ describe('Rule', () => {
     })
 
     it('serializes itself', () => {
-      let json = rule.toJSON(false)
+      let json = rule.toJSON()
       expect(Object.keys(json).length).to.equal(3)
       expect(json.conditions).to.eql(conditions)
       expect(json.priority).to.eql(priority)
