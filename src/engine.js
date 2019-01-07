@@ -198,7 +198,7 @@ class Engine extends EventEmitter {
           this.emit('failure', rule.event, almanac, ruleResult)
         }
       }).catch((error) => {
-        this.emit('error', error)
+        this.listenerCount('error') > 0 && this.emit('error', error)
         throw error
       })
     }))
@@ -224,7 +224,7 @@ class Engine extends EventEmitter {
       debug(`engine::run ruleResult:${ruleResult.result}`)
       return ruleResult
     }).catch((error) => {
-      this.emit('error', error)
+      this.listenerCount('error') > 0 && this.emit('error', error)
       throw error
     })
   }

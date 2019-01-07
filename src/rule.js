@@ -275,7 +275,7 @@ class Rule extends EventEmitter {
       error.rule = {
         name: this.name
       }
-      this.emit('error', error)
+      this.listenerCount('error') > 0 && this.emit('error', error)
       throw error
     }
 
